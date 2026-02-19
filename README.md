@@ -33,6 +33,7 @@ There is also a CRX file at https://github.com/R4356th/lexeme-linker/releases.
 4.  **Confirm the Edit Summary**: Customize the summary if needed, or save your own via the 💾 icon.
 5.  **Save**: Click **সংরক্ষণ করুন** to update the Wiktionary page instantly.
 
+There is also a [video demo](Demo.mp4) you can watch.
 ## ⚠️ Important Note
 
 Please always ensure that any unique information on the Wiktionary page (like etymology or pronunciation) has been properly migrated to the Wikidata Lexeme before performing a full-page replacement.
