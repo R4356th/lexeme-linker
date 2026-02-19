@@ -57,7 +57,7 @@
         <span class="ll-close">&times;</span>
       </div>
       <div class="ll-content">
-        <p>বাংলা উইকিঅভিধানে এই লেক্সিমের মূল লেমার সাথে মিলে যায় এমন একটি ভুক্তি আছে:<strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>.</p>
+        <p>বাংলা উইকিঅভিধানে এই লেক্সিমের মূল লেমার সাথে মিলে যায় এমন একটি ভুক্তি আছে: <strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>.</p>
         <div class="ll-preview-container">
           <textarea id="ll-wikitext-editor">${escapeHTML(displayContent)}</textarea>
           <div class="ll-editor-tools">
