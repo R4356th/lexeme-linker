@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Wikidata Lexeme Linker",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Streamlines linking Wikidata Lexemes to Bengali Wiktionary entries.",
   "permissions": [
     "storage",
