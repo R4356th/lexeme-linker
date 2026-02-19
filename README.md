@@ -1,4 +1,4 @@
-ˇ# Lexeme Linker
+# Lexeme Linker
 A Chrome extension designed to streamline the process of linking **Wikidata lexemes** to their corresponding entries on **Bengali Wiktionary** (বাংলা উইকিঅভিধান).
 
 ## Key Features
