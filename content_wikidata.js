@@ -37,14 +37,19 @@
     }
   });
 
-  function renderOverlay(lemma, lexemeId, content) {
-    const overlay = document.createElement('div');
-    overlay.id = 'lexeme-linker-card';
-    overlay.className = 'lexeme-wikt-overlay';    
+  async function renderOverlay(lemma, lexemeId, content) {
     const previewLength = 800;
     let isTruncated = content.length > previewLength;
     const displayContent = isTruncated ? content.substring(0, previewLength) : content;
-    const defaultSummary = `ব্রাউজার এক্সটেনশনের সাহায্যে উইকিউপাত্ত লেক্সিম ${lexemeId}-এর সাথে সংযোগ তৈরি করছি`;
+    const systemDefaultSummary = `ব্রাউজার এক্সটেনশনের সাহায্যে উইকিউপাত্ত লেক্সিম ${lexemeId}-এর সাথে সংযোগ তৈরি করছি`;
+    
+    // Load custom summary from storage
+    const storage = await chrome.storage.local.get('customSummary');
+    const defaultSummary = storage.customSummary || systemDefaultSummary;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'lexeme-linker-card';
+    overlay.className = 'lexeme-wikt-overlay';
 
     overlay.innerHTML = `
       <div class="ll-header">
@@ -66,7 +71,13 @@
           <strong>⚠️ সতর্কতা:</strong> এই ভুক্তির টেক্সট সম্পূর্ণভাবে প্রতিস্থাপন করার আগে নিশ্চিত করুন যে, বর্তমানে ভুক্তিতে আছে এমন সব তথ্য (অন্যান্য ভাষার বিষয়বস্তুসহ) এই লেক্সিমে আনা হয়েছে বা আছে।
         </p>
         <div class="ll-custom-summary">
-          <label for="ll-summary-input">সম্পাদনার সারাংশ:</label>
+          <div class="ll-summary-header">
+            <label for="ll-summary-input">সম্পাদনার সারাংশ:</label>
+            <div class="ll-summary-actions">
+               <span id="ll-save-summary" title="ডিফল্ট হিসেবে সেভ করুন">💾</span>
+               <span id="ll-reset-summary" title="মূল ডিফল্টে ফিরে যান">🔄</span>
+            </div>
+          </div>
           <input type="text" id="ll-summary-input" value="${defaultSummary}">
         </div>
         <div id="ll-status"></div>
@@ -81,6 +92,9 @@
     const insertBtn = overlay.querySelector('#ll-insert-template');
     const insertNoHeadingBtn = overlay.querySelector('#ll-insert-no-heading');
     const replaceAllBtn = overlay.querySelector('#ll-replace-all');
+    const summaryInput = overlay.querySelector('#ll-summary-input');
+    const saveSummaryBtn = overlay.querySelector('#ll-save-summary');
+    const resetSummaryBtn = overlay.querySelector('#ll-reset-summary');
 
     overlay.querySelector('.ll-close').onclick = () => overlay.remove();
 
@@ -116,8 +130,19 @@
       textarea.focus();
     };
 
+    saveSummaryBtn.onclick = async () => {
+      const val = summaryInput.value;
+      await chrome.storage.local.set({ customSummary: val });
+      updateStatus('ডিফল্ট সারাংশ সফলভাবে সেভ করা হয়েছে।', 'green');
+    };
+
+    resetSummaryBtn.onclick = async () => {
+      await chrome.storage.local.remove('customSummary');
+      summaryInput.value = systemDefaultSummary;
+      updateStatus('মূল ডিফল্ট সারাংশে ফিরে আসা হয়েছে।', 'blue');
+    };
+
     overlay.querySelector('#ll-replace-btn').onclick = () => {
-      const summaryInput = document.getElementById('ll-summary-input');
       const summary = summaryInput ? summaryInput.value : defaultSummary;
       const newText = textarea.value;
       

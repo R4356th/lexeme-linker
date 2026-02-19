@@ -75,10 +75,8 @@ function normalizeLemma(text) {
   return norm;
 }
 
-async function executeReplace(lemma, lexemeId, tabId, customSummary, newText) {
+async function executeReplace(lemma, lexemeId, tabId, summary, newText) {
   const apiBase = 'https://bn.wiktionary.org/w/api.php';
-  const defaultSummary = `ব্রাউজার এক্সটেনশনের সাহায্যে উইকিউপাত্ত লেক্সিম ${lexemeId}-এর সাথে সংযোগ তৈরি করছি`;
-  const summary = customSummary || defaultSummary;
   const text = newText || `{{লে|${lexemeId}}}`;
   
   try {

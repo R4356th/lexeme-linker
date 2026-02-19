@@ -132,12 +132,34 @@
   margin-bottom: 15px;
 }
 
+.ll-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.ll-summary-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.ll-summary-actions span {
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.ll-summary-actions span:hover {
+  opacity: 1;
+}
+
 .ll-custom-summary label {
   display: block;
   font-size: 11px;
   font-weight: 600;
   color: #586069;
-  margin-bottom: 4px;
 }
 
 .ll-custom-summary input {
