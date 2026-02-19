@@ -1,4 +1,4 @@
-# Lexeme Linker
+ˇ# Lexeme Linker
 A Chrome extension designed to streamline the process of linking **Wikidata lexemes** to their corresponding entries on **Bengali Wiktionary** (বাংলা উইকিঅভিধান).
 
 ## Key Features
@@ -37,6 +37,13 @@ OR: Download the CRX file from https://github.com/R4356th/lexeme-linker/releases
 
 Please always ensure that any unique information on the Wiktionary page (like etymology or pronunciation) has been properly migrated to the Wikidata Lexeme before performing a full-page replacement.
 
-## 📄 License
+## Copyright
+Lexeme Linker - A Chrome extension for linking Wikidata lexemes to their corresponding entries on Bengali Wiktionary
 Copyright (C) 2026 Radman Siddiki
-This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses/.
+
