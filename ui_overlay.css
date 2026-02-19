@@ -1,0 +1,183 @@
+.lexeme-wikt-overlay {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 380px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 2147483647; /* Max z-index to stay on top */
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  border: 1px solid #e1e4e8;
+  overflow: hidden;
+  animation: ll-slide-in 0.3s ease-out;
+}
+
+@keyframes ll-slide-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.ll-header {
+  background: #f6f8fa;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e1e4e8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ll-header strong {
+  color: #24292e;
+  font-size: 14px;
+}
+
+.ll-close {
+  cursor: pointer;
+  font-size: 20px;
+  color: #586069;
+  line-height: 1;
+}
+
+.ll-close:hover {
+  color: #24292e;
+}
+
+.ll-content {
+  padding: 16px;
+}
+
+.ll-content p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #24292e;
+  line-height: 1.5;
+}
+
+.ll-preview-container {
+  background: #f8f9fa;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+#ll-wikitext-editor {
+  width: 100%;
+  height: 150px;
+  margin: 0;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  resize: vertical;
+  color: #444;
+  box-sizing: border-box;
+}
+
+#ll-wikitext-editor:focus {
+  outline: none;
+}
+
+.ll-editor-tools {
+  padding: 8px;
+  border-top: 1px solid #e1e4e8;
+  background: #f6f8fa;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.ll-editor-tools button {
+  padding: 4px 8px;
+  font-size: 11px;
+  border: 1px solid #d1d5da;
+  background: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #24292e;
+}
+
+.ll-editor-tools button:hover {
+  background: #f3f4f6;
+  border-color: #1b1f2326;
+}
+
+.ll-editor-tools button.ll-btn-danger {
+  color: #cf222e;
+  border-color: #d1d5da;
+}
+
+.ll-editor-tools button.ll-btn-danger:hover {
+  background: #ffebe9;
+  border-color: #cf222e;
+}
+
+.ll-warning {
+  background: #fffbdd;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  padding: 10px;
+  color: #735c0f !important;
+  font-size: 12px !important;
+  margin-bottom: 12px;
+}
+
+.ll-custom-summary {
+  margin-bottom: 15px;
+}
+
+.ll-custom-summary label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #586069;
+  margin-bottom: 4px;
+}
+
+.ll-custom-summary input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.ll-custom-summary input:focus {
+  outline: none;
+  border-color: #0366d6;
+  box-shadow: 0 0 0 3px rgba(3,102,214,0.1);
+}
+
+#ll-replace-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #2ea44f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+#ll-replace-btn:hover {
+  background-color: #2c974b;
+}
+
+#ll-replace-btn:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+}
+
+#ll-status {
+  font-size: 12px;
+  text-align: center;
+}

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Wikidata Lexeme Linker",
+  "version": "1.0",
+  "description": "Streamlines linking Wikidata Lexemes to Bengali Wiktionary entries.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.wikidata.org/*",
+    "https://bn.wiktionary.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.wikidata.org/wiki/Lexeme:L*"],
+      "js": ["content_wikidata.js"],
+      "css": ["ui_overlay.css"]
+    }
+  ]
+}
