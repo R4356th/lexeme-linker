@@ -23,7 +23,7 @@ A Chrome extension designed to streamline the process of linking **Wikidata lexe
 4.  Click **Load unpacked**.
 5.  Select the folder where you cloned the repository.
 
-OR: Download the CRX file from https://github.com/R4356th/lexeme-linker/releases.
+There is also a CRX file at https://github.com/R4356th/lexeme-linker/releases.
 
 ## How to Use
 
