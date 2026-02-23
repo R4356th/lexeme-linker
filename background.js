@@ -30,30 +30,46 @@ async function checkWiktionary(lemma, lexemeId, tabId) {
     const pages = data.query.pages;
     const pageId = Object.keys(pages).find(id => id !== '-1');
 
-    if (!pageId) return;
+    if (pageId) {
+      const page = pages[pageId];
+      
+      if (!page.revisions || !page.revisions[0]) {
+        console.log('Lexeme Linker: Page found but no revisions returned.', page);
+        return;
+      }
 
-    const page = pages[pageId];
-    const content = page.revisions[0]['*'];
-    const title = page.title;
+      const content = page.revisions[0]['*'];
+      const title = page.title;
 
-    // Check if the current lexemeId is already linked using the template
-    const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
-    let existingIds = [];
-    let match;
-    while ((match = templateRegex.exec(content)) !== null) {
-      existingIds.push(match[1]);
+      // Check if the current lexemeId is already linked using the template
+      const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
+      let existingIds = [];
+      let match;
+      while ((match = templateRegex.exec(content)) !== null) {
+        existingIds.push(match[1]);
+      }
+
+      if (existingIds.includes(lexemeId)) {
+        return;
+      }
+      
+      chrome.tabs.sendMessage(tabId, {
+        action: 'showUI',
+        content: content,
+        lemma: title,
+        lexemeId: lexemeId,
+        isNew: false
+      });
+    } else {
+      // Page doesn't exist. Propose creating one with the normalized lemma.
+      chrome.tabs.sendMessage(tabId, {
+        action: 'showUI',
+        content: '',
+        lemma: normalized, 
+        lexemeId: lexemeId,
+        isNew: true
+      });
     }
-
-    if (existingIds.includes(lexemeId)) {
-      return;
-    }
-    
-    chrome.tabs.sendMessage(tabId, {
-      action: 'showUI',
-      content: content,
-      lemma: title,
-      lexemeId: lexemeId
-    });
 
   } catch (error) {
     console.error('Lexeme Linker background error:', error);
