@@ -32,10 +32,10 @@
     if (request.action === 'showUI') {
       renderOverlay(request.lemma, request.lexemeId, request.content, request.isNew);
     } else if (request.action === 'editSuccess') {
-      updateStatus('Success! Page updated.', 'green');
+      updateStatus('সম্পাদনা সম্পন্ন হয়েছে।', 'green');
       setTimeout(() => document.getElementById('lexeme-linker-card')?.remove(), 3000);
     } else if (request.action === 'editError') {
-      updateStatus(`Error: ${request.message}`, 'red');
+      updateStatus(`ত্রুটি: ${request.message}`, 'red');
     }
   });
 
