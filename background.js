@@ -1,14 +1,14 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkWiktionary') {
-    checkWiktionary(request.lemma, request.lexemeId, sender.tab.id);
+    checkWiktionary(request.lemma, request.lexemeId, sender.tab.id, request.hasBengaliSense);
   } else if (request.action === 'executeReplace') {
     executeReplace(request.lemma, request.lexemeId, sender.tab.id, request.summary, request.newText);
   }
   return true;
 });
 
-async function checkWiktionary(lemma, lexemeId, tabId) {
   // Normalize lemma for Arabic script variations
+async function checkWiktionary(lemma, lexemeId, tabId, hasBengaliSense) {
   const variants = [lemma];
   const normalized = normalizeLemma(lemma);
   if (normalized !== lemma) {
@@ -22,26 +22,16 @@ async function checkWiktionary(lemma, lexemeId, tabId) {
     const response = await fetch(api);
     const data = await response.json();
 
-    if (!data.query || !data.query.pages) {
-      console.log('Lexeme Linker: Unexpected API response', data);
-      return;
-    }
-
     const pages = data.query.pages;
-    const pageId = Object.keys(pages).find(id => id !== '-1');
+    const pageId = Object.keys(pages).find(id => parseInt(id) > 0);
 
     if (pageId) {
       const page = pages[pageId];
-      
-      if (!page.revisions || !page.revisions[0]) {
-        console.log('Lexeme Linker: Page found but no revisions returned.', page);
-        return;
-      }
+      if (!page.revisions || !page.revisions[0]) return;
 
       const content = page.revisions[0]['*'];
       const title = page.title;
 
-      // Check if the current lexemeId is already linked using the template
       const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
       let existingIds = [];
       let match;
@@ -49,28 +39,35 @@ async function checkWiktionary(lemma, lexemeId, tabId) {
         existingIds.push(match[1]);
       }
 
-      if (existingIds.includes(lexemeId)) {
-        return;
-      }
+      if (existingIds.includes(lexemeId)) return;
       
       chrome.tabs.sendMessage(tabId, {
         action: 'showUI',
         content: content,
         lemma: title,
         lexemeId: lexemeId,
-        isNew: false
+        isNew: false,
+        hasBengaliSense: hasBengaliSense
       });
     } else {
-      // Page doesn't exist. Propose creating one with the normalized lemma.
+      // Propose creating a new entry even if no Bengali sense exists 
+      // if the lemma uses Bengali or Arabic/Persian script
+      // (This is a workaround for a bug.)
+      const isInterestingScript = /[\u0980-\u09FF\u0600-\u06FF]/.test(lemma);
+      
+      if (!hasBengaliSense && !isInterestingScript) {
+        return;
+      }
+
       chrome.tabs.sendMessage(tabId, {
         action: 'showUI',
         content: '',
         lemma: normalized, 
         lexemeId: lexemeId,
-        isNew: true
+        isNew: true,
+        hasBengaliSense: hasBengaliSense
       });
     }
-
   } catch (error) {
     console.error('Lexeme Linker background error:', error);
   }
@@ -99,11 +96,6 @@ async function executeReplace(lemma, lexemeId, tabId, summary, newText) {
     const tokenUrl = `${apiBase}?action=query&meta=tokens&type=csrf&format=json`;
     const tokenRes = await fetch(tokenUrl);
     const tokenData = await tokenRes.json();
-    
-    if (!tokenData.query || !tokenData.query.tokens) {
-      throw new Error(`Failed to get edit token: ${JSON.stringify(tokenData)}`);
-    }
-    
     const editToken = tokenData.query.tokens.csrftoken;
 
     const editParams = new URLSearchParams({
@@ -126,7 +118,6 @@ async function executeReplace(lemma, lexemeId, tabId, summary, newText) {
     } else {
       chrome.tabs.sendMessage(tabId, { action: 'editError', message: JSON.stringify(editResult) });
     }
-
   } catch (error) {
     console.error('Lexeme Linker edit error:', error);
     chrome.tabs.sendMessage(tabId, { action: 'editError', message: error.message });

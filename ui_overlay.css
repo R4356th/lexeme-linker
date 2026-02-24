@@ -203,3 +203,11 @@
   font-size: 12px;
   text-align: center;
 }
+
+.ll-missing-sense {
+  display: inline-block;
+  margin-top: 8px;
+  color: #cf222e;
+  font-weight: 600;
+  font-size: 11px;
+}

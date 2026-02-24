@@ -1,20 +1,24 @@
 (async function() {
-  const lexemeId = window.location.href.split(':')[2];
+  const lexemeId = window.location.pathname.split(':').pop().split(/[?#]/)[0];
+  if (!lexemeId || !lexemeId.startsWith('L')) return;
+
+  let lexemeData = null;
 
   try {
-    const wdData = await fetchEntityData(lexemeId);
-    const lemmas = wdData.lemmas;
-    if (!lemmas || Object.values(lemmas).length === 0) return;
+    lexemeData = await fetchEntityData(lexemeId);
+    if (!lexemeData || !lexemeData.lemmas) {
+    }
     
-    const primaryLemma = Object.values(lemmas)[0].value;
-    const hasBengaliSense = wdData.senses.some(sense => sense.glosses.bn);
-
-    if (!hasBengaliSense) return;
+    const lemmaValues = Object.values(lexemeData.lemmas);
+    if (lemmaValues.length === 0) return;
     
+    const primaryLemma = lemmaValues[0].value;
+    const hasBengaliSense = lexemeData.senses && lexemeData.senses.some(sense => sense.glosses && sense.glosses.bn);
     chrome.runtime.sendMessage({
       action: 'checkWiktionary',
       lemma: primaryLemma,
-      lexemeId: lexemeId
+      lexemeId: lexemeId,
+      hasBengaliSense: hasBengaliSense
     });
 
   } catch (error) {
@@ -22,7 +26,7 @@
   }
 
   async function fetchEntityData(id) {
-    const api = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${id}&format=json&origin=*`;
+    const api = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${id}&format=json`;
     const response = await fetch(api);
     const data = await response.json();
     return data.entities[id];
@@ -30,7 +34,7 @@
 
   chrome.runtime.onMessage.addListener((request) => {
     if (request.action === 'showUI') {
-      renderOverlay(request.lemma, request.lexemeId, request.content, request.isNew);
+      renderOverlay(request.lemma, request.lexemeId, request.content, request.isNew, request.hasBengaliSense);
     } else if (request.action === 'editSuccess') {
       updateStatus('সম্পাদনা সম্পন্ন হয়েছে।', 'green');
       setTimeout(() => document.getElementById('lexeme-linker-card')?.remove(), 3000);
@@ -39,7 +43,7 @@
     }
   });
 
-  async function renderOverlay(lemma, lexemeId, content, isNew = false) {
+  async function renderOverlay(lemma, lexemeId, content, isNew = false, hasBengaliSense = true) {
     const previewLength = 800;
     let isTruncated = content.length > previewLength;
     const template = `{{লে|${lexemeId}}}`;
@@ -57,9 +61,15 @@
     overlay.id = 'lexeme-linker-card';
     overlay.className = 'lexeme-wikt-overlay';
 
-    const statusMsg = isNew 
-      ? `বাংলা উইকিঅভিধানে <strong>${lemma}</strong> নামে কোনো ভুক্তি নেই। আপনি কি এটি তৈরি করতে চান?`
-      : `বাংলা উইকিঅভিধানে এই লেক্সিমের মূল লেমার সাথে মিলে যায় এমন একটি ভুক্তি আছে: <strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>.`;
+    let statusMsg = '';
+    if (isNew) {
+      statusMsg = `বাংলা উইকিঅভিধানে <strong>${lemma}</strong> নামে কোনো ভুক্তি নেই। আপনি কি এটি তৈরি করতে চান?`;
+    } else {
+      statusMsg = `বাংলা উইকিঅভিধানে একটি ভুক্তি আছে: <strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>.`;
+      if (!hasBengaliSense) {
+        statusMsg += `<br><span class="ll-missing-sense">⚠️ উইকিউপাত্তের এই লেক্সিমে কোনো <strong>বাংলা অর্থ (Sense)</strong> যোগ করা নেই।</span>`;
+      }
+    }
 
     const buttonLabel = isNew ? 'তৈরি করুন' : 'সংরক্ষণ করুন';
 
@@ -75,13 +85,14 @@
           <div class="ll-editor-tools">
             ${isNew ? '' : '<button id="ll-replace-all" type="button" class="ll-btn-danger">সব মুছুন এবং টেমপ্লেট বসান</button>'}
             <button id="ll-insert-template" type="button">টেমপ্লেট বসান</button>
-            <button id="ll-insert-no-heading" type="button">সেকশন হেডিং ছাড়া টেম্পলেট বসান</button>
+            <button id="ll-insert-no-heading" type="button">ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</button>
             ${isTruncated && !isNew ? '<button id="ll-load-full" type="button">সম্পূর্ণ টেক্সট লোড করুন</button>' : ''}
           </div>
         </div>
         <p class="ll-warning">
-          <strong>⚠️ সতর্কতা:</strong> ${isNew ? 'ভুক্তিটি তৈরি করার আগে নিশ্চিত করুন যে আপনি সঠিক তথ্য দিচ্ছেন।' : 'এই ভুক্তির টেক্সট সম্পূর্ণভাবে প্রতিস্থাপন করার আগে নিশ্চিত করুন যে, বর্তমানে ভুক্তিতে আছে এমন সব তথ্য (অন্যান্য ভাষার বিষয়বস্তুসহ) এই লেক্সিমে আনা হয়েছে বা আছে।'}
+          ${!hasBengaliSense ? '<strong>💡 পরামর্শ:</strong> আপনি নিচের প্রিভিউ বক্স থেকে তথ্য দেখে এই লেক্সিমটি সমৃদ্ধ করতে পারেন। এরপর Wiktionary-তে টেমপ্লেটটি বসান।' : `<strong>⚠️ সতর্কতা:</strong> ${isNew ? 'ভুক্তিটি তৈরি করার আগে নিশ্চিত করুন যে আপনি সঠিক তথ্য দিচ্ছেন।' : 'এই ভুক্তির টেক্সট সম্পূর্ণভাবে প্রতিস্থাপন করার আগে নিশ্চিত করুন যে, বর্তমানে ভুক্তিতে আছে এমন সব তথ্য (অন্যান্য ভাষার বিষয়বস্তুসহ) এই লেক্সিমে আনা হয়েছে বা আছে।'}`}
         </p>
+
         <div class="ll-custom-summary">
           <div class="ll-summary-header">
             <label for="ll-summary-input">সম্পাদনার সারাংশ:</label>
