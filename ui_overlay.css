@@ -118,6 +118,55 @@
   border-color: #cf222e;
 }
 
+.ll-lemma-selector {
+  margin-bottom: 15px;
+  background: #f1f3f5;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+}
+
+.ll-lemma-selector label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #586069;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ll-lemma-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ll-lemma-tab {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #d1d5da;
+  background: #ffffff;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #24292e;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ll-lemma-tab:hover {
+  background: #f3f4f6;
+  border-color: #1b1f2326;
+  transform: translateY(-1px);
+}
+
+.ll-lemma-tab.active {
+  background: #0366d6;
+  color: #ffffff;
+  border-color: #0366d6;
+  box-shadow: 0 2px 4px rgba(3,102,214,0.2);
+}
+
 .ll-warning {
   background: #fffbdd;
   border: 1px solid #d1d5da;

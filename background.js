@@ -8,13 +8,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
   // Normalize lemma for Arabic script variations
-async function checkWiktionary(lemma, lexemeId, tabId, hasBengaliSense) {
-  const variants = [lemma];
-  const normalized = normalizeLemma(lemma);
-  if (normalized !== lemma) {
-    variants.push(normalized);
-  }
+async function checkWiktionary(lemmaInput, lexemeId, tabId, hasBengaliSense) {
+  const inputLemmas = Array.isArray(lemmaInput) ? lemmaInput : [lemmaInput];
+  const allVariants = new Set();
+  
+  inputLemmas.forEach(l => {
+    allVariants.add(l);
+    const normalized = normalizeLemma(l);
+    if (normalized !== l) {
+      allVariants.add(normalized);
+    }
+  });
 
+  const variants = Array.from(allVariants);
   const titles = variants.map(v => encodeURIComponent(v)).join('|');
   const api = `https://bn.wiktionary.org/w/api.php?action=query&prop=revisions&titles=${titles}&rvprop=content&redirects=1&format=json`;
   
@@ -23,48 +29,54 @@ async function checkWiktionary(lemma, lexemeId, tabId, hasBengaliSense) {
     const data = await response.json();
 
     const pages = data.query.pages;
-    const pageId = Object.keys(pages).find(id => parseInt(id) > 0);
+    const results = [];
 
-    if (pageId) {
+    // Process existing pages
+    for (const pageId in pages) {
       const page = pages[pageId];
-      if (!page.revisions || !page.revisions[0]) return;
+      if (parseInt(pageId) > 0) {
+        if (!page.revisions || !page.revisions[0]) continue;
+        
+        const content = page.revisions[0]['*'];
+        const title = page.title;
 
-      const content = page.revisions[0]['*'];
-      const title = page.title;
+        const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
+        let isLinked = false;
+        let match;
+        while ((match = templateRegex.exec(content)) !== null) {
+          if (match[1] === lexemeId) {
+            isLinked = true;
+            break;
+          }
+        }
 
-      const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
-      let existingIds = [];
-      let match;
-      while ((match = templateRegex.exec(content)) !== null) {
-        existingIds.push(match[1]);
+        if (isLinked) continue;
+
+        results.push({
+          lemma: title,
+          content: content,
+          isNew: false
+        });
+      } else {
+        // This title is missing
+        const title = page.title;
+        const isInterestingScript = /[\u0980-\u09FF\u0600-\u06FF]/.test(title);
+        
+        if (hasBengaliSense || isInterestingScript) {
+          results.push({
+            lemma: title,
+            content: '',
+            isNew: true
+          });
+        }
       }
+    }
 
-      if (existingIds.includes(lexemeId)) return;
-      
+    if (results.length > 0) {
       chrome.tabs.sendMessage(tabId, {
         action: 'showUI',
-        content: content,
-        lemma: title,
+        results: results,
         lexemeId: lexemeId,
-        isNew: false,
-        hasBengaliSense: hasBengaliSense
-      });
-    } else {
-      // Propose creating a new entry even if no Bengali sense exists 
-      // if the lemma uses Bengali or Arabic/Persian script
-      // (This is a workaround for a bug.)
-      const isInterestingScript = /[\u0980-\u09FF\u0600-\u06FF]/.test(lemma);
-      
-      if (!hasBengaliSense && !isInterestingScript) {
-        return;
-      }
-
-      chrome.tabs.sendMessage(tabId, {
-        action: 'showUI',
-        content: '',
-        lemma: normalized, 
-        lexemeId: lexemeId,
-        isNew: true,
         hasBengaliSense: hasBengaliSense
       });
     }
