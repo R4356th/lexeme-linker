@@ -1,4 +1,17 @@
 (async function() {
+  let activeGlobalKeyHandler = null;
+
+  function removeCard() {
+    const card = document.getElementById('lexeme-linker-card');
+    if (card) {
+      if (activeGlobalKeyHandler) {
+        document.removeEventListener('keydown', activeGlobalKeyHandler);
+        activeGlobalKeyHandler = null;
+      }
+      card.remove();
+    }
+  }
+
   const lexemeId = window.location.pathname.split(':').pop().split(/[?#]/)[0];
   if (!lexemeId || !lexemeId.startsWith('L')) return;
 
@@ -37,7 +50,7 @@
       renderOverlay(request.results, request.lexemeId, request.hasBengaliSense);
     } else if (request.action === 'editSuccess') {
       updateStatus('সম্পাদনা সম্পন্ন হয়েছে।', 'green');
-      setTimeout(() => document.getElementById('lexeme-linker-card')?.remove(), 3000);
+      setTimeout(() => removeCard(), 3000);
     } else if (request.action === 'editError') {
       updateStatus(`ত্রুটি: ${request.message}`, 'red');
     }
@@ -45,8 +58,6 @@
 
   async function renderOverlay(results, lexemeId, hasBengaliSense = true) {
     let currentIndex = 0;
-    const previewLength = 800;
-
     const overlay = document.createElement('div');
     overlay.id = 'lexeme-linker-card';
     overlay.className = 'lexeme-wikt-overlay';
@@ -58,9 +69,8 @@
       const content = current.content;
       const isNew = current.isNew;
 
-      let isTruncated = content.length > previewLength;
       const template = `{{লে|${lexemeId}}}`;
-      const displayContent = isNew ? template : (isTruncated ? content.substring(0, previewLength) : content);
+      const displayContent = isNew ? template : content;
       
       const systemDefaultSummary = 'লেক্সিম লিংকার এক্সটেনশনের সাহায্যে ' + (isNew 
         ? `উইকিউপাত্ত লেক্সিম ${lexemeId}-এর জন্য একটি নতুন ভুক্তি তৈরি করছি`
@@ -108,7 +118,6 @@
               ${isNew ? '' : '<button id="ll-replace-all" type="button" class="ll-btn-danger">সব মুছুন এবং টেমপ্লেট বসান</button>'}
               <button id="ll-insert-template" type="button">টেমপ্লেট বসান</button>
               <button id="ll-insert-no-heading" type="button">ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</button>
-              ${isTruncated && !isNew ? '<button id="ll-load-full" type="button">সম্পূর্ণ টেক্সট লোড করুন</button>' : ''}
             </div>
           </div>
           <p class="ll-warning">
@@ -146,7 +155,7 @@
         summaryInput.value = storage.customSummary || systemDefaultSummary;
       });
 
-      overlay.querySelector('.ll-close').onclick = () => overlay.remove();
+      overlay.querySelector('.ll-close').onclick = () => removeCard();
 
       tabs.forEach(tab => {
         tab.onclick = () => {
@@ -189,6 +198,8 @@
         };
       }
 
+      textarea.focus();
+
       saveSummaryBtn.onclick = async () => {
         const val = summaryInput.value;
         await chrome.storage.local.set({ customSummary: val });
@@ -219,6 +230,20 @@
         });
       };
     }
+
+    activeGlobalKeyHandler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const current = results[currentIndex];
+        if (current && current.isNew) {
+          const btn = overlay.querySelector('#ll-replace-btn');
+          if (btn && !btn.disabled) {
+            e.preventDefault();
+            btn.click();
+          }
+        }
+      }
+    };
+    document.addEventListener('keydown', activeGlobalKeyHandler);
 
     updateView();
   }
