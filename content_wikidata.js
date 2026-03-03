@@ -172,23 +172,17 @@
       }
 
       insertBtn.onclick = () => {
-        const template = `{{লে|${lexemeId}}}`;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const text = textarea.value;
-        textarea.value = text.substring(0, start) + template + text.substring(end);
+        const template = `\n{{লে|${lexemeId}}}`;
+        textarea.value = textarea.value.trimEnd() + template;
         textarea.focus();
-        textarea.setSelectionRange(start + template.length, start + template.length);
+        textarea.scrollTop = textarea.scrollHeight;
       };
 
       insertNoHeadingBtn.onclick = () => {
-        const template = `{{লে|${lexemeId}|না}}`;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const text = textarea.value;
-        textarea.value = text.substring(0, start) + template + text.substring(end);
+        const template = `\n{{লে|${lexemeId}|না}}`;
+        textarea.value = textarea.value.trimEnd() + template;
         textarea.focus();
-        textarea.setSelectionRange(start + template.length, start + template.length);
+        textarea.scrollTop = textarea.scrollHeight;
       };
 
       if (replaceAllBtn) {
