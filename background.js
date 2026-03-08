@@ -94,8 +94,6 @@ function normalizeLemma(text) {
   norm = norm.replace(/[يى]/g, "ی");
   // Normalize Kaf variants (ك to ک)
   norm = norm.replace(/ك/g, "ک");
-  // Normalize Te Marbuta (ة to ه)
-  norm = norm.replace(/ة/g, "ه");
   
   return norm;
 }
