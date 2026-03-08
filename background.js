@@ -88,12 +88,6 @@ async function checkWiktionary(lemmaInput, lexemeId, tabId, hasBengaliSense) {
 function normalizeLemma(text) {
   // Strip Arabic harakat (diacritics)
   let norm = text.replace(/[\u064B-\u065F\u0670]/g, "");
-  // Normalize Alef variants
-  norm = norm.replace(/[أإآ]/g, "ا");
-  // Normalize Yeh variants (ي/ى to ی)
-  norm = norm.replace(/[يى]/g, "ی");
-  // Normalize Kaf variants (ك to ک)
-  norm = norm.replace(/ك/g, "ک");
   
   return norm;
 }
