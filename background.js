@@ -16,6 +16,7 @@ async function checkWiktionary(lemmaInput, lexemeId, tabId, hasBengaliSense) {
     allVariants.add(l);
     const normalized = normalizeLemma(l);
     if (normalized !== l) {
+      allVariants.delete(l);
       allVariants.add(normalized);
     }
   });
