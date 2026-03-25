@@ -66,7 +66,8 @@
     function updateView() {
       const current = results[currentIndex];
       const lemma = current.lemma;
-      const content = current.content.replace('{{ভাষা|', '{{langname|');
+      let content = current.content.replace('{{ভাষা|', '{{langname|');
+      content = content.replace('{{sense|', '{{বোধ|');
       const isNew = current.isNew;
 
       const template = `{{লে|${lexemeId}}}`;
