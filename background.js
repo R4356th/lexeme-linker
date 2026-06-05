@@ -41,7 +41,7 @@ async function checkWiktionary(lemmaInput, lexemeId, tabId, hasBengaliSense) {
         const content = page.revisions[0]['*'];
         const title = page.title;
 
-        const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*\}\}/gi;
+        const templateRegex = /\{\{\s*লে\s*\|\s*(L\d+)[^{}]*/gi;
         let isLinked = false;
         let match;
         while ((match = templateRegex.exec(content)) !== null) {
