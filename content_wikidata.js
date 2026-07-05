@@ -67,6 +67,8 @@
       const current = results[currentIndex];
       const lemma = current.lemma;
       let content = current.content.replace('{{ভাষা|', '{{langname|');
+      content = content.replace('{{IPA|', '{{আধ্বব|');
+      content = content.replace('{{com|', '{{compound|');
       content = content.replace('{{sense|', '{{বোধ|');
       const isNew = current.isNew;
 
