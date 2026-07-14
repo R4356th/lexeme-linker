@@ -83,7 +83,7 @@
       if (isNew) {
         statusMsg = `বাংলা উইকিঅভিধানে <strong>${lemma}</strong> নামে কোনো ভুক্তি নেই। আপনি কি এটি তৈরি করতে চান?`;
       } else {
-        statusMsg = `বাংলা উইকিঅভিধানে একটি ভুক্তি আছে: <strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>.`;
+        statusMsg = `বাংলা উইকিঅভিধানে একটি ভুক্তি আছে: <strong><a href="https://bn.wiktionary.org/wiki/${encodeURIComponent(lemma)}" target="_blank">${lemma}</a></strong>।`;
         if (!hasBengaliSense) {
           statusMsg += `<br><span class="ll-missing-sense">⚠️ উইকিউপাত্তের এই লেক্সিমে কোনো <strong>বাংলা অর্থ (Sense)</strong> যোগ করা নেই।</span>`;
         }
@@ -109,7 +109,7 @@
 
       overlay.innerHTML = `
         <div class="ll-header">
-          <strong>Lexeme Linker</strong>
+          <strong>লেক্সিম লিংকার</strong>
           <span class="ll-close">&times;</span>
         </div>
         <div class="ll-content">
@@ -123,10 +123,6 @@
               <button id="ll-insert-no-heading" type="button">ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</button>
             </div>
           </div>
-          <p class="ll-warning">
-            ${!hasBengaliSense ? '<strong>💡 পরামর্শ:</strong> আপনি নিচের প্রিভিউ বক্স থেকে তথ্য দেখে এই লেক্সিমটি সমৃদ্ধ করতে পারেন। এরপর Wiktionary-তে টেমপ্লেটটি বসান।' : `<strong>⚠️ সতর্কতা:</strong> ${isNew ? 'ভুক্তিটি তৈরি করার আগে নিশ্চিত করুন যে আপনি সঠিক তথ্য দিচ্ছেন।' : 'এই ভুক্তির টেক্সট সম্পূর্ণভাবে প্রতিস্থাপন করার আগে নিশ্চিত করুন যে, বর্তমানে ভুক্তিতে আছে এমন সব তথ্য (অন্যান্য ভাষার বিষয়বস্তুসহ) এই লেক্সিমে আনা হয়েছে বা আছে।'}`}
-          </p>
-  
           <div class="ll-custom-summary">
             <div class="ll-summary-header">
               <label for="ll-summary-input">সম্পাদনার সারাংশ:</label>
@@ -138,6 +134,7 @@
             <input type="text" id="ll-summary-input" value="">
           </div>
           <div id="ll-status"></div>
+          <p class="ll-shortcuts">⌨️ শর্টকাট: Ctrl/Cmd + Enter/ S, Ctrl/Cmd + 9, Ctrl/Cmd + 1, Ctrl/Cmd + 2</p>
           <button id="ll-replace-btn">${buttonLabel}</button>
         </div>
       `;
@@ -229,15 +226,44 @@
     }
 
     activeGlobalKeyHandler = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        const current = results[currentIndex];
-        if (current && current.isNew) {
-          const btn = overlay.querySelector('#ll-replace-btn');
-          if (btn && !btn.disabled) {
-            e.preventDefault();
-            btn.click();
-          }
+      const isModifierPressed = e.ctrlKey || e.metaKey;
+      if (!isModifierPressed || e.altKey) return;
+
+      const textarea = overlay.querySelector('#ll-wikitext-editor');
+      if (!textarea) return;
+
+      if (e.key === 'Enter' || e.key.toLowerCase() === 's') {
+        const btn = overlay.querySelector('#ll-replace-btn');
+        if (btn && !btn.disabled) {
+          e.preventDefault();
+          btn.click();
         }
+        return;
+      }
+
+      if (e.key === '9') {
+        e.preventDefault();
+        textarea.value = `{{লে|${lexemeId}}}`;
+        textarea.focus();
+        textarea.scrollTop = 0;
+        return;
+      }
+
+      if (e.key === '1') {
+        e.preventDefault();
+        const template = `\n{{লে|${lexemeId}}}`;
+        textarea.value = textarea.value.trimEnd() + template;
+        textarea.focus();
+        textarea.scrollTop = textarea.scrollHeight;
+        return;
+      }
+
+      if (e.key === '2') {
+        e.preventDefault();
+        const template = `{{লে|${lexemeId}}}\n`;
+        textarea.value = template + textarea.value.replace(/^\s*/, '');
+        textarea.focus();
+        textarea.scrollTop = 0;
       }
     };
     document.addEventListener('keydown', activeGlobalKeyHandler);
