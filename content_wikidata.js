@@ -136,6 +136,7 @@
           <div id="ll-status"></div>
           <p class="ll-shortcuts">⌨️ শর্টকাট:<br />
           Ctrl/Cmd + Enter/S/Return: সম্পাদনা সংরক্ষণ করুন<br />
+          Ctrl/Cmd + =: সেকশনগুলোকে টেম্পলেট প্যারামিটারে রূপান্তর করুন<br />
           Ctrl/Cmd + 9: সব মুছে টেম্পলেট বসান<br />
           Ctrl/Cmd + 2: প্রথম লাইনে টেমপ্লেট বসান<br />
           Ctrl/Cmd + 1: শেষ লাইনে টেম্পলেট বসান<br /> 
@@ -248,6 +249,16 @@
         return;
       }
 
+      if (e.key === '=') {
+        e.preventDefault();
+        const params = ['উচ্চারণ', 'ব্যুৎপত্তি', 'বিকল্প বানান', 'বিকল্প রূপ', '{{অর্থ}}'];
+        params.forEach(param => {
+          const regex = new RegExp(`==* *${param} *==*`);
+          textarea.value = textarea.value.replace(regex, `|${param.replace('{{', '').replace('}}', '')}=`);
+        });
+        return;
+      }
+
       if (e.key === '9') {
         e.preventDefault();
         textarea.value = `{{লে|${lexemeId}}}`;
@@ -280,6 +291,7 @@
         textarea.value = textarea.value.trimEnd() + template;
         textarea.focus();
         textarea.scrollTop = textarea.scrollHeight;
+        return;
       }
 
       if (e.key === '4') {
@@ -288,6 +300,7 @@
         textarea.value = template + textarea.value.replace(/=* *{{langname\|[A-Za-z]+}} *=*/, '').replace(/^\s*/, '');
         textarea.focus();
         textarea.scrollTop = 0;
+        return;
       }
     };
     document.addEventListener('keydown', activeGlobalKeyHandler);
