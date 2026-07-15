@@ -118,7 +118,7 @@
           <div class="ll-preview-container">
             <textarea id="ll-wikitext-editor">${escapeHTML(displayContent)}</textarea>
             <div class="ll-editor-tools">
-              ${isNew ? '' : '<button id="ll-replace-all" type="button" class="ll-btn-danger">সব মুছুন এবং টেমপ্লেট বসান</button>'}
+              ${isNew ? '' : '<button id="ll-replace-all" type="button" class="ll-btn-danger">সব মুছে টেম্পলেট বসান</button>'}
               <button id="ll-insert-template" type="button">টেমপ্লেট বসান</button>
               <button id="ll-insert-no-heading" type="button">ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</button>
             </div>
@@ -134,7 +134,7 @@
             <input type="text" id="ll-summary-input" value="">
           </div>
           <div id="ll-status"></div>
-          <p class="ll-shortcuts">⌨️ শর্টকাট: Ctrl/Cmd + Enter/ S, Ctrl/Cmd + 9, Ctrl/Cmd + 1, Ctrl/Cmd + 2</p>
+          <p class="ll-shortcuts">⌨️ শর্টকাট: <br />Ctrl/Cmd + Enter/S/Return: সম্পাদনা সংরক্ষণ করুন<br /> Ctrl/Cmd + 9: সব মুছে টেম্পলেট বসান<br /> Ctrl/Cmd + 2: প্রথম লাইনে টেমপ্লেট বসান<br /> Ctrl/Cmd + 1: শেষ লাইনে টেম্পলেট বসান<br /> Ctrl/Cmd + 3: শেষ লাইনে ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</p>
           <button id="ll-replace-btn">${buttonLabel}</button>
         </div>
       `;
@@ -264,6 +264,15 @@
         textarea.value = template + textarea.value.replace(/^\s*/, '');
         textarea.focus();
         textarea.scrollTop = 0;
+        return;
+      }
+
+      if (e.key === '3') {
+        e.preventDefault();
+        const template = `\n{{লে|${lexemeId}|না}}`;
+        textarea.value = textarea.value.trimEnd() + template;
+        textarea.focus();
+        textarea.scrollTop = textarea.scrollHeight;
       }
     };
     document.addEventListener('keydown', activeGlobalKeyHandler);

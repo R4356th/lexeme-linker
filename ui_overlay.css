@@ -167,16 +167,6 @@
   box-shadow: 0 2px 4px rgba(3,102,214,0.2);
 }
 
-.ll-warning {
-  background: #fffbdd;
-  border: 1px solid #d1d5da;
-  border-radius: 6px;
-  padding: 10px;
-  color: #735c0f !important;
-  font-size: 12px !important;
-  margin-bottom: 12px;
-}
-
 .ll-custom-summary {
   margin-bottom: 15px;
 }

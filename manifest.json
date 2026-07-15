@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Wikidata Lexeme Linker",
+  "name": "Lexeme Linker",
   "version": "2.0.0",
   "description": "Streamlines linking Wikidata Lexemes to Bengali Wiktionary entries.",
   "permissions": [
@@ -8,7 +8,6 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://www.wikidata.org/*",
     "https://bn.wiktionary.org/*"
   ],
   "background": {
