@@ -134,7 +134,14 @@
             <input type="text" id="ll-summary-input" value="">
           </div>
           <div id="ll-status"></div>
-          <p class="ll-shortcuts">⌨️ শর্টকাট: <br />Ctrl/Cmd + Enter/S/Return: সম্পাদনা সংরক্ষণ করুন<br /> Ctrl/Cmd + 9: সব মুছে টেম্পলেট বসান<br /> Ctrl/Cmd + 2: প্রথম লাইনে টেমপ্লেট বসান<br /> Ctrl/Cmd + 1: শেষ লাইনে টেম্পলেট বসান<br /> Ctrl/Cmd + 3: শেষ লাইনে ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান</p>
+          <p class="ll-shortcuts">⌨️ শর্টকাট:<br />
+          Ctrl/Cmd + Enter/S/Return: সম্পাদনা সংরক্ষণ করুন<br />
+          Ctrl/Cmd + 9: সব মুছে টেম্পলেট বসান<br />
+          Ctrl/Cmd + 2: প্রথম লাইনে টেমপ্লেট বসান<br />
+          Ctrl/Cmd + 1: শেষ লাইনে টেম্পলেট বসান<br /> 
+          Ctrl/Cmd + 3: শেষ লাইনে ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান<br />
+          Ctrl/Cmd + 4: প্রথম লাইনে টেমপ্লেট বসান ভুক্তির প্রথম ভাষার সেকশন হেডিং অপসারণ করে<br />
+          </p>
           <button id="ll-replace-btn">${buttonLabel}</button>
         </div>
       `;
@@ -273,6 +280,14 @@
         textarea.value = textarea.value.trimEnd() + template;
         textarea.focus();
         textarea.scrollTop = textarea.scrollHeight;
+      }
+
+      if (e.key === '4') {
+        e.preventDefault();
+        const template = `{{লে|${lexemeId}}}\n`;
+        textarea.value = template + textarea.value.replace(/=* *{{langname\|[A-Za-z]+}} *=*/, '').replace(/^\s*/, '');
+        textarea.focus();
+        textarea.scrollTop = 0;
       }
     };
     document.addEventListener('keydown', activeGlobalKeyHandler);
