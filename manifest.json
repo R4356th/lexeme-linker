@@ -4,8 +4,7 @@
   "version": "3.0.0",
   "description": "Streamlines linking Wikidata Lexemes to Bengali Wiktionary entries.",
   "permissions": [
-    "storage",
-    "activeTab"
+    "storage"
   ],
   "host_permissions": [
     "https://bn.wiktionary.org/*"

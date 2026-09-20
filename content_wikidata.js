@@ -142,6 +142,7 @@
           Ctrl/Cmd + 1: শেষ লাইনে টেম্পলেট বসান<br /> 
           Ctrl/Cmd + 3: শেষ লাইনে ভাষার সেকশন হেডিং ছাড়া টেম্পলেট বসান<br />
           Ctrl/Cmd + 4: প্রথম লাইনে টেমপ্লেট বসান ভুক্তির প্রথম ভাষার সেকশন হেডিং অপসারণ করে<br />
+          Ctrl/Cmd + D: খালি অনুবাদ, উচ্চারণ, সমার্থক শব্দ, উদ্ভূত শব্দ এবং প্রয়োগ অংশগুলো মুছে দিন<br />
           </p>
           <button id="ll-replace-btn">${buttonLabel}</button>
         </div>
@@ -251,11 +252,32 @@
 
       if (e.key === '=') {
         e.preventDefault();
-        const params = ['উচ্চারণ', 'ব্যুৎপত্তি', 'বিকল্প বানান', 'বিকল্প রূপ', '{{অর্থ}}'];
+        const params = ['উচ্চারণ', 'ব্যুৎপত্তি', 'বিকল্প বানান', 'বিকল্প রূপ', '{{অর্থ}}', 'অর্থ'];
         params.forEach(param => {
           const regex = new RegExp(`==* *${param} *==*`);
           textarea.value = textarea.value.replace(regex, `|${param.replace('{{', '').replace('}}', '')}=`);
         });
+        return;
+      }
+
+      if (e.key === 'd') {
+        e.preventDefault();
+        const emptyTranslationBlock = /=== *অনুবাদসমূহ *===\n\{\{অনুবাদ-শীর্ষ\}\}\n:\* \{\{en\}\}: \n\{\{অনুবাদ-নীচ\}\}/g;
+        const BNSourceTemplate = '{{উৎস-ভাষা|bn}}';
+        const emptyAltLexCat = `=== পদান্তর ===
+#`
+        const emptySynoynmDescendantsAndUsage = `
+=== সমার্থক শব্দ ===
+===উদ্ভূত শব্দ===
+#
+===প্রয়োগ===
+#`
+        const emptyPronunciationBlock = /=== *উচ্চারণ *===\n\{\{অডিও-দেশ-ভাষা\|bn\}\}/g;
+        textarea.value = textarea.value.replace(emptyTranslationBlock, '')
+        textarea.value = textarea.value.replace(emptyAltLexCat, '')
+        textarea.value = textarea.value.replace(emptySynoynmDescendantsAndUsage, '')
+        textarea.value = textarea.value.replace(emptyPronunciationBlock, '')
+        textarea.value = textarea.value.replace(BNSourceTemplate, '')
         return;
       }
 
